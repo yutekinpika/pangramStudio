@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パングラム作成補助ツール</title>
+    <style>
+        .text-box {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        .letter {
+            font-size: 20px;
+            margin: 5px;
+        }
+        .gray {
+            color: #d3d3d3;  /* 薄い灰色 */
+        }
+        .red {
+            color: red;
+        }
+        .normal {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>パングラム作成補助ツール</h1>
+
+    <textarea class="text-box" id="inputText" placeholder="文を入力してください..."></textarea>
+
+    <div id="alphabetContainer">
+        <!-- 50音表示 -->
+        <span class="letter">あ</span>
+        <span class="letter">い</span>
+        <span class="letter">う</span>
+        <span class="letter">え</span>
+        <span class="letter">お</span>
+        <span class="letter">か</span>
+        <span class="letter">き</span>
+        <span class="letter">く</span>
+        <span class="letter">け</span>
+        <span class="letter">こ</span>
+        <span class="letter">さ</span>
+        <span class="letter">し</span>
+        <span class="letter">す</span>
+        <span class="letter">せ</span>
+        <span class="letter">そ</span>
+        <span class="letter">た</span>
+        <span class="letter">ち</span>
+        <span class="letter">つ</span>
+        <span class="letter">て</span>
+        <span class="letter">と</span>
+        <span class="letter">な</span>
+        <span class="letter">に</span>
+        <span class="letter">ぬ</span>
+        <span class="letter">ね</span>
+        <span class="letter">の</span>
+        <span class="letter">は</span>
+        <span class="letter">ひ</span>
+        <span class="letter">ふ</span>
+        <span class="letter">へ</span>
+        <span class="letter">ほ</span>
+        <span class="letter">ま</span>
+        <span class="letter">み</span>
+        <span class="letter">む</span>
+        <span class="letter">め</span>
+        <span class="letter">も</span>
+        <span class="letter">や</span>
+        <span class="letter">ゆ</span>
+        <span class="letter">よ</span>
+        <span class="letter">ら</span>
+        <span class="letter">り</span>
+        <span class="letter">る</span>
+        <span class="letter">れ</span>
+        <span class="letter">ろ</span>
+        <span class="letter">わ</span>
+        <span class="letter">を</span>
+        <span class="letter">ん</span>
+    </div>
+
+    <script>
+        // 濁音を対応する清音に変換するマップ
+        const dakutenMap = {
+            か: "か", き: "き", く: "く", け: "け", こ: "こ",
+            が: "か", ぎ: "き", ぐ: "く", げ: "け", ご: "こ",
+            さ: "さ", し: "し", す: "す", せ: "せ", そ: "そ",
+            ざ: "さ", じ: "し", ず: "す", ぜ: "せ", ぞ: "そ",
+            た: "た", ち: "ち", つ: "つ", て: "て", と: "と",
+            だ: "た", ぢ: "ち", づ: "つ", で: "て", ど: "と",
+            な: "な", に: "に", ぬ: "ぬ", ね: "ね", の: "の",
+            は: "は", ひ: "ひ", ふ: "ふ", へ: "へ", ほ: "ほ",
+            ば: "は", び: "ひ", ぶ: "ふ", べ: "へ", ぼ: "ほ",
+            ぱ: "は", ぴ: "ひ", ぷ: "ふ", ぺ: "へ", ぽ: "ほ",
+            ま: "ま", み: "み", む: "む", め: "め", も: "も",
+            や: "や", ゆ: "ゆ", よ: "よ",
+            ら: "ら", り: "り", る: "る", れ: "れ", ろ: "ろ",
+            わ: "わ", を: "を", ん: "ん"
+        };
+
+        // 促音・拗音の処理を含むマップ
+        const smallKanaMap = {
+            ぁ: "あ", ぃ: "い", ぅ: "う", ぇ: "え", ぉ: "お",
+            ゃ: "や", ゅ: "ゆ", ょ: "よ", っ: "つ", ゎ: "わ",
+            ゐ: "い", ゑ: "え"
+        };
+
+        document.getElementById("inputText").addEventListener("input", function() {
+            const text = this.value;
+            const letterCounts = {};
+
+            // 文中で使われた各文字の出現回数をカウント
+            for (let char of text) {
+                if (char.match(/[ぁ-んァ-ン一-龯]/)) {
+                    // 濁音・拗音・促音の変換
+                    let baseChar = dakutenMap[char] || char;
+                    baseChar = smallKanaMap[baseChar] || baseChar;
+                    letterCounts[baseChar] = (letterCounts[baseChar] || 0) + 1;
+                }
+            }
+
+            // 50音を色分けする
+            const letters = document.querySelectorAll('.letter');
+            letters.forEach(letter => {
+                const letterText = letter.textContent;
+
+                // 文字が1回のみ使われている場合は灰色、2回以上使われている場合は赤色、それ以外は黒
+                if (letterCounts[letterText] === 1) {
+                    letter.classList.add('gray');
+                    letter.classList.remove('red', 'normal');
+                } else if (letterCounts[letterText] > 1) {
+                    letter.classList.add('red');
+                    letter.classList.remove('gray', 'normal');
+                } else {
+                    letter.classList.add('normal');
+                    letter.classList.remove('gray', 'red');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
