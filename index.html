@@ -3,19 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>パングラム作成補助ツール</title>
-    <style>
+    <title>アナグラムスタジオ(β)</title>
+     <style>
         .text-box {
             width: 100%;
             height: 100px;
             margin-bottom: 20px;
+             white-space: pre-wrap; /* 折り返し表示 */
+             word-break: break-all; /* 単語の途中でも改行 */
+        }
+        .letter-container {
+            display: inline-block;
+            text-align: center;
+            margin: 5px;
         }
         .letter {
             font-size: 20px;
-            margin: 5px;
+        }
+        .count {
+            font-size: 12px;
         }
         .gray {
-            color: #f3f3f3;  /* 薄い灰色 */
+            color: #f3f3f3;
         }
         .red {
             color: red;
@@ -23,79 +32,147 @@
         .normal {
             color: black;
         }
-        /* 10x5のグリッドレイアウトを適用 */
         #alphabetContainer {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);  /* 5列に分ける */
-            grid-template-rows: repeat(10, auto);    /* 10行に分ける */
-            gap: 10px; /* 各マスの間に隙間を作る */
-            max-width: 500px;  /* 幅を調整 */
-            margin: 0 auto;  /* 中央寄せ */
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(10, auto);
+            gap: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        #customContainer {
+            display: grid;
+             grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+             max-width: 500px;
+            margin: 0 auto;
+        }
+        .ok-message {
+            color: red;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+         .ng-message {
+            color: blue;
+            margin-left: 10px;
+            font-weight: bold;
+              display: inline-block;
+        }
+        .unavailable-chars {
+            color: black;
+            margin-left: 5px;
+             font-size: 14px;
+            display: inline-block;
+        }
+         .input-container {
+            margin-bottom: 20px;
+        }
+         .input-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+         .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+         .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }
+         .switch-container {
+           display: flex;
+             align-items: center;
+            margin-bottom: 10px;
+        }
+          .switch-label {
+            margin-right: 10px; /* ラベルとスイッチの間隔 */
+        }
+        .red-text {
+            color: red;
         }
     </style>
 </head>
 <body>
-    <h1>パングラム作成補助ツール</h1>
+    <h1>アナグラムスタジオ(β)</h1>
 
-    <textarea class="text-box" id="inputText" placeholder="文を入力してください..."></textarea>
-
+    <div class="input-container">
+        <span class="input-label">チェックしたい文章</span>
+         <div style="display: flex; align-items: center;">
+           <span id="okMessage" class="ok-message" style="display: none;">OK!</span>
+            <div style="display: flex; align-items: center;">
+                <span id="ngMessage" class="ng-message" style="display: none;">NG</span>
+                <span id="unavailableChars" class="unavailable-chars" style="display: none;"></span>
+             </div>
+        </div>
+        <textarea class="text-box" id="inputText" placeholder="文を入力してください..."></textarea>
+    </div>
+    
     <div id="alphabetContainer">
         <!-- 50音表示 -->
-        <span class="letter">あ</span>
-        <span class="letter">い</span>
-        <span class="letter">う</span>
-        <span class="letter">え</span>
-        <span class="letter">お</span>
-        <span class="letter">か</span>
-        <span class="letter">き</span>
-        <span class="letter">く</span>
-        <span class="letter">け</span>
-        <span class="letter">こ</span>
-        <span class="letter">さ</span>
-        <span class="letter">し</span>
-        <span class="letter">す</span>
-        <span class="letter">せ</span>
-        <span class="letter">そ</span>
-        <span class="letter">た</span>
-        <span class="letter">ち</span>
-        <span class="letter">つ</span>
-        <span class="letter">て</span>
-        <span class="letter">と</span>
-        <span class="letter">な</span>
-        <span class="letter">に</span>
-        <span class="letter">ぬ</span>
-        <span class="letter">ね</span>
-        <span class="letter">の</span>
-        <span class="letter">は</span>
-        <span class="letter">ひ</span>
-        <span class="letter">ふ</span>
-        <span class="letter">へ</span>
-        <span class="letter">ほ</span>
-        <span class="letter">ま</span>
-        <span class="letter">み</span>
-        <span class="letter">む</span>
-        <span class="letter">め</span>
-        <span class="letter">も</span>
-        <span class="letter">や</span>
-        <span class="letter">　</span>
-        <span class="letter">ゆ</span>
-        <span class="letter">　</span>
-        <span class="letter">よ</span>
-        <span class="letter">ら</span>
-        <span class="letter">り</span>
-        <span class="letter">る</span>
-        <span class="letter">れ</span>
-        <span class="letter">ろ</span>
-        <span class="letter">わ</span>
-        <span class="letter">　</span>
-        <span class="letter">を</span>
-        <span class="letter">　</span>
-        <span class="letter">ん</span>
+    </div>
+     <div id="customContainer" style="display: none;">
+       <!-- 使用可能文字の表示 -->
     </div>
 
+     <div class="input-container">
+      <div class="switch-container">
+            <span class="switch-label">使用可能文字を厳しく区別する</span>
+             <label class="switch">
+                <input type="checkbox" id="strictMode">
+                <span class="slider round"></span>
+            </label>
+        </div>
+         <span class="input-label">使用可能文字</span>
+      <textarea class="text-box" id="availableChars" placeholder="使用可能文字を入力してください..."></textarea>
+    </div>
+    
+   
+
+
     <script>
-        // 濁音を対応する清音に変換するマップ
-        const dakutenMap = {
+         const dakutenMap = {
             か: "か", き: "き", く: "く", け: "け", こ: "こ",
             が: "か", ぎ: "き", ぐ: "く", げ: "け", ご: "こ",
             さ: "さ", し: "し", す: "す", せ: "せ", そ: "そ",
@@ -111,46 +188,219 @@
             ら: "ら", り: "り", る: "る", れ: "れ", ろ: "ろ",
             わ: "わ", を: "を", ん: "ん"
         };
-
-        // 促音・拗音の処理を含むマップ
         const smallKanaMap = {
             ぁ: "あ", ぃ: "い", ぅ: "う", ぇ: "え", ぉ: "お",
             ゃ: "や", ゅ: "ゆ", ょ: "よ", っ: "つ", ゎ: "わ",
             ゐ: "い", ゑ: "え"
         };
+        const alphabet = [
+            "あ", "い", "う", "え", "お",
+            "か", "き", "く", "け", "こ",
+            "さ", "し", "す", "せ", "そ",
+            "た", "ち", "つ", "て", "と",
+            "な", "に", "ぬ", "ね", "の",
+            "は", "ひ", "ふ", "へ", "ほ",
+            "ま", "み", "む", "め", "も",
+            "や", "　", "ゆ", "　", "よ",
+            "ら", "り", "る", "れ", "ろ",
+            "わ", "　", "を", "　", "ん"
+        ];
 
-        document.getElementById("inputText").addEventListener("input", function() {
-            const text = this.value;
-            const letterCounts = {};
+        const alphabetContainer = document.getElementById('alphabetContainer');
+        const customContainer = document.getElementById('customContainer');
+        const availableCharsInput = document.getElementById('availableChars');
+        const inputTextarea = document.getElementById('inputText');
+        const okMessage = document.getElementById('okMessage');
+        const ngMessage = document.getElementById('ngMessage');
+        const unavailableCharsElement = document.getElementById('unavailableChars');
+        const strictModeCheckbox = document.getElementById('strictMode');
+        const noCountChars = ["　"];
+        let strictMode = false; // 初期値はオフ
 
-            // 文中で使われた各文字の出現回数をカウント
-            for (let char of text) {
-                if (char.match(/[ぁ-んァ-ン一-龯]/)) {
-                    // 濁音・拗音・促音の変換
-                    let baseChar = dakutenMap[char] || char;
-                    baseChar = smallKanaMap[baseChar] || baseChar;
-                    letterCounts[baseChar] = (letterCounts[baseChar] || 0) + 1;
-                }
-            }
+        // 初期値設定
+         inputTextarea.value = "ここにかかれたぶんしょうをチェックします";
+        availableCharsInput.value = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん";
 
-            // 50音を色分けする
-            const letters = document.querySelectorAll('.letter');
-            letters.forEach(letter => {
-                const letterText = letter.textContent;
-
-                // 文字が1回のみ使われている場合は灰色、2回以上使われている場合は赤色、それ以外は黒
-                if (letterCounts[letterText] === 1) {
-                    letter.classList.add('gray');
-                    letter.classList.remove('red', 'normal');
-                } else if (letterCounts[letterText] > 1) {
-                    letter.classList.add('red');
-                    letter.classList.remove('gray', 'normal');
-                } else {
-                    letter.classList.add('normal');
-                    letter.classList.remove('gray', 'red');
-                }
-            });
+        // 初期表示の50音の枠を作成
+        alphabet.forEach(char => {
+            const container = document.createElement('div');
+            container.classList.add('letter-container');
+            const letterSpan = document.createElement('span');
+            letterSpan.classList.add('letter', 'normal');
+            letterSpan.textContent = char;
+            const countSpan = document.createElement('span');
+            countSpan.classList.add('count');
+             if (!noCountChars.includes(char)) {
+                countSpan.textContent = '(0/0)';
+             }
+            container.appendChild(letterSpan);
+            container.appendChild(countSpan);
+            alphabetContainer.appendChild(container);
         });
+
+
+        function updateDisplay() {
+            const text = inputTextarea.value;
+            const availableChars = availableCharsInput.value;
+            const letterCounts = {};
+            let allGray = true;
+            let unavailableChars = [];
+            let isNg = false;
+
+              // テキストボックス内の文字を赤くする処理
+               let formattedText = "";
+                for (let char of text) {
+                    let baseChar;
+                    if (!strictMode) {
+                        baseChar = dakutenMap[char] || char;
+                       baseChar = smallKanaMap[baseChar] || baseChar;
+                    } else {
+                       baseChar = char;
+                    }
+
+                    if (char.match(/[ぁ-んァ-ン一-龯]/) && !availableChars.includes(char) && !availableChars.includes(baseChar))
+                     {
+                         formattedText += `<span class="red-text">${char}</span>`;
+                            unavailableChars.push(char);
+                            isNg = true;
+                   } else {
+                       formattedText += char;
+                   }
+               }
+           inputTextarea.innerHTML = formattedText;
+            unavailableCharsElement.textContent = isNg ? "使用不可文字：" + unavailableChars.join("") : "";
+            unavailableCharsElement.style.display = isNg ? 'inline' : 'none';
+
+
+              if (strictMode) {
+                 alphabetContainer.style.display = 'none';
+                  customContainer.style.display = 'grid';
+                  customContainer.innerHTML = ''; // 表示を更新するため一旦クリア
+
+                  const availableCharsArray = [...new Set(availableChars.split(''))];
+                    availableCharsArray.forEach((char, index) => {
+                     const container = document.createElement('div');
+                       container.classList.add('letter-container');
+                       const letterSpan = document.createElement('span');
+                        letterSpan.classList.add('letter', 'normal');
+                        letterSpan.textContent = char;
+                      const countSpan = document.createElement('span');
+                        countSpan.classList.add('count');
+                         if (!noCountChars.includes(char)) {
+                           countSpan.textContent = '(0/0)';
+                          }
+                        container.appendChild(letterSpan);
+                        container.appendChild(countSpan);
+                       customContainer.appendChild(container);
+                  });
+
+                   for (let char of text) {
+                         let baseChar;
+                           if (!strictMode) {
+                             baseChar = dakutenMap[char] || char;
+                             baseChar = smallKanaMap[baseChar] || baseChar;
+                         } else {
+                             baseChar = char;
+                        }
+                    if (char.match(/[ぁ-んァ-ン一-龯]/)) {
+                        letterCounts[baseChar] = (letterCounts[baseChar] || 0) + 1;
+                       }
+                    }
+
+
+                   const letterContainers = document.querySelectorAll('#customContainer .letter-container');
+                   letterContainers.forEach((container, index) => {
+                       const letterSpan = container.querySelector('.letter');
+                        const countSpan = container.querySelector('.count');
+                       const letterText = letterSpan.textContent;
+                       const count = letterCounts[letterText] || 0;
+                       const availableCount = availableChars.split('').filter(char => (dakutenMap[char] || char) === letterText || (smallKanaMap[char] || char) === letterText || char === letterText).length;
+
+                        if (noCountChars.includes(letterText)) {
+                            countSpan.textContent = "";
+                        } else {
+                            countSpan.textContent = `(${count}/${availableCount})`;
+                       }
+                         if (count === availableCount) {
+                            letterSpan.classList.add('gray');
+                            letterSpan.classList.remove('red', 'normal');
+                        } else if(count > availableCount) {
+                            letterSpan.classList.add('red');
+                           letterSpan.classList.remove('gray', 'normal');
+                            allGray = false;
+                        } else {
+                             letterSpan.classList.add('normal');
+                           letterSpan.classList.remove('gray', 'red');
+                            allGray = false;
+                        }
+                   });
+
+
+
+              } else {
+                 alphabetContainer.style.display = 'grid';
+                  customContainer.style.display = 'none';
+
+
+                   for (let char of text) {
+                       let baseChar;
+                       if (!strictMode) {
+                             baseChar = dakutenMap[char] || char;
+                            baseChar = smallKanaMap[baseChar] || baseChar;
+                       }else{
+                         baseChar = char;
+                      }
+                    if (char.match(/[ぁ-んァ-ン一-龯]/)) {
+                        letterCounts[baseChar] = (letterCounts[baseChar] || 0) + 1;
+                       }
+                    }
+                    const letterContainers = document.querySelectorAll('#alphabetContainer .letter-container');
+                     letterContainers.forEach((container, index) => {
+                       const letterSpan = container.querySelector('.letter');
+                        const countSpan = container.querySelector('.count');
+                       const letterText = letterSpan.textContent;
+                       const count = letterCounts[letterText] || 0;
+                       const availableCount = availableChars.split('').filter(char => (dakutenMap[char] || char) === letterText || (smallKanaMap[char] || char) === letterText || char === letterText).length;
+                          if (noCountChars.includes(letterText)) {
+                           countSpan.textContent = "";
+                         } else {
+                         countSpan.textContent = `(${count}/${availableCount})`;
+                        }
+
+                         if (count === availableCount) {
+                            letterSpan.classList.add('gray');
+                            letterSpan.classList.remove('red', 'normal');
+                        } else if(count > availableCount) {
+                            letterSpan.classList.add('red');
+                            letterSpan.classList.remove('gray', 'normal');
+                           allGray = false;
+                        } else {
+                             letterSpan.classList.add('normal');
+                           letterSpan.classList.remove('gray', 'red');
+                            allGray = false;
+                        }
+                     });
+                }
+
+              if (isNg) {
+                  okMessage.style.display = 'none';
+                  ngMessage.style.display = 'inline';
+              } else if(allGray) {
+                  okMessage.style.display = 'inline';
+                 ngMessage.style.display = 'none';
+              } else {
+                  okMessage.style.display = 'none';
+                    ngMessage.style.display = 'inline';
+            }
+        }
+
+         strictModeCheckbox.addEventListener('change', function() {
+            strictMode = this.checked;
+           updateDisplay();
+        });
+        inputTextarea.addEventListener("input", updateDisplay);
+        availableCharsInput.addEventListener('input', updateDisplay);
+        updateDisplay();
     </script>
 </body>
 </html>
